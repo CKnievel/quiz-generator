@@ -7,10 +7,6 @@ import yaml
 import json
 from pathlib import Path
 
-#export LANGCHAIN_TRACING_V2="true"
-#export LANGCHAIN_API_KEY="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"
-
-
 class ChatTooling:
     def __init__(self) -> None:
         self.config = self.load_config(Path("utils/config_chat.yaml"))
