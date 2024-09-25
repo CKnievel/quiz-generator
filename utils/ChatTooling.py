@@ -70,15 +70,11 @@ class ChatTooling:
                 serialized_messages.append({"type": "human", "content": message.content})
             elif isinstance(message, AIMessage):
                 serialized_messages.append({"type": "ai", "content": message.content})
-            elif isinstance(message, SystemMessage):
-                serialized_messages.append({"type": "system", "content": message.content})
+            
         return serialized_messages
 
     @traceable
-    def query(self, user_input):
-        # Manually add the human input to the memory
-        self.conversation_buffer.chat_memory.add_message(HumanMessage(content=user_input))
-        
+    def query(self, user_input):                
         # Serialize the conversation history
         serialized_history = self._serialize_messages(self.conversation_buffer.chat_memory.messages)
         
@@ -90,8 +86,11 @@ class ChatTooling:
             "history": serialized_history,
             "input": user_input
         })
+        
+        # Manually add the human input to the memory
+        self.conversation_buffer.chat_memory.add_message(HumanMessage(content=user_input))
 
-       # Manually add the AI response to the memory
+        # Manually add the AI response to the memory
         self.conversation_buffer.chat_memory.add_message(response)
 
         return response.content
