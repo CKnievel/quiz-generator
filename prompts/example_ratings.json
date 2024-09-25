@@ -1,0 +1,38 @@
+[
+    {
+    "question": "You're designing a RL agent to play a card game where some cards are face-down. How does the concept of 'Markov states' come into play, and what challenge does this present?",
+    "answer": "In this card game, Markov states are tricky because the face-down cards mean we don't have full information. The agent can't just rely on what it sees right now to make perfect decisions. We might need to use techniques like maintaining a belief state about what those hidden cards could be, based on the game's history. This way, the agent can make the best guess about the current state and act accordingly, even without seeing everything.",
+    "rating": "9",
+    "explanation": "This answer effectively relates Markov states to a real-world scenario, explaining the challenge of partial observability in an accessible way."
+    },
+    {
+    "question": "You're creating a RL system for a robot to learn to walk. How would you approach designing the reward function, and what's one way it could go wrong?",
+    "answer": "For a walking robot, we might design a reward function that gives points for forward movement and stability. However, if we're not careful, this could backfire. For example, if we only reward distance covered, the robot might learn to throw itself forward instead of walking properly. A better approach would be to reward smooth, efficient movements and penalize falls or erratic behavior. The key is to think about what we really want the robot to achieve and make sure our rewards align with that goal.",
+    "rating": "9",
+    "explanation": "This answer provides a practical example of reward function design, highlighting a common pitfall and suggesting a more robust approach."
+    },
+    {
+    "question": "In a RL context, what's the difference between on-policy and off-policy learning? Can you give an example of each?",
+    "answer": "On-policy learning is when the agent learns from actions it actually took, while off-policy learning can learn from actions it didn't necessarily take. An example of on-policy would be SARSA, and Q-learning is off-policy.",
+    "rating": "6",
+    "explanation": "This answer provides a basic distinction between on-policy and off-policy learning and gives correct examples, but lacks depth in explaining the implications or advantages of each approach."
+    },
+    {
+    "question": "How does the epsilon-greedy strategy help with the exploration-exploitation dilemma in RL?",
+    "answer": "Epsilon-greedy helps by sometimes choosing random actions instead of the best known action. This allows the agent to explore new possibilities.",
+    "rating": "5",
+    "explanation": "While this answer captures the basic idea of epsilon-greedy, it doesn't explain the 'dilemma' aspect, doesn't mention how epsilon works, and doesn't discuss how this strategy balances exploration and exploitation over time."
+    },
+    {
+    "question": "Imagine you're developing a RL agent to play a complex strategy game with fog of war (hidden information). How would you handle the challenges of partial observability, long-term planning (affected by the gamma parameter), and the need for exploration?",
+    "answer": "In a strategy game with fog of war, we're dealing with a triple threat: partial observability, the need for long-term planning, and the exploration-exploitation dilemma. To handle this, we might use a combination of techniques. For partial observability, we could use a recurrent neural network to maintain a memory of past observations. For long-term planning, we'd need to carefully tune our gamma parameter to balance immediate tactics with long-term strategy. As for exploration, we might start with a high exploration rate to gather information about the map and enemy strategies, then gradually shift towards exploitation as the game progresses. The key is to create an agent that can adapt its strategy based on incomplete information while still planning for the future.",
+    "rating": "10",
+    "explanation": "This answer effectively combines multiple RL concepts in a realistic scenario, demonstrating how they interact and how an agent might adapt to these combined challenges."
+    },
+    {
+    "question": "What is the role of the discount factor (gamma) in RL, and how might you choose its value for different types of problems?",
+    "answer": "The discount factor determines how much future rewards are valued compared to immediate rewards. A higher gamma means the agent cares more about long-term rewards.",
+    "rating": "4",
+    "explanation": "This answer provides a basic understanding of the discount factor but doesn't explain how to choose values for different problems or discuss the implications of different gamma values on agent behavior."
+    }
+    ]

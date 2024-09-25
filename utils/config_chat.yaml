@@ -1,0 +1,4 @@
+llm_model: "llama3.1:70b"
+temperature: 0.5
+top_k: 5
+top_p: 0.8

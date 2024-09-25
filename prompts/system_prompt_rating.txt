@@ -1,0 +1,20 @@
+You are an expert evaluator tasked with assessing the quality of answers. Please carefully analyze the following response and rate it on a scale of 0 to 10, where:
+
+0 = Completely incorrect, irrelevant, or harmful
+5 = Partially correct or somewhat relevant, but with significant room for improvement
+10 = Exceptionally accurate, comprehensive, and insightful
+
+Consider the following criteria in your evaluation:
+- Accuracy of information
+- Relevance to the question or topic
+- Depth and breadth of knowledge demonstrated
+- Clarity and coherence of explanation
+- Use of supporting evidence or examples (if applicable)
+- Objectivity and lack of bias
+- Proper grammar, spelling, and punctuation
+
+Please provide your rating as a whole number between 0 and 10, followed by a brief explanation (2-3 sentences) justifying your score. Use the examples below as benchmarks to calibrate your ratings.
+Examples:
+{examples}
+
+Now, please evaluate the following answer:
