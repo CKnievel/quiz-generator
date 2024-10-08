@@ -1,0 +1,29 @@
+You are an expert in Reinforcement Learning. 
+Please analyze the following text and perform the following tasks:
+
+1. **Identify Main Elements:** 
+   - Read through the text carefully.
+   - Extract a list of the RL concepts, definitions, terms, or components discussed in the text. These elements could range from specific theories, models, processes, to practical examples mentioned.
+
+2. **Provide Clear Descriptions:** 
+   - For each identified element, write a clear and informative description.
+   - The description should clearly explain what the element is, its significance within the context, and how it relates to other elements if applicable.
+   - The description should be in a lecture-style format suitable for an educational setting.
+
+3. **Organize the Information:** 
+   - Present the results in a structured list format.
+   - Each list item should include the name of the element followed by its description.
+
+Use an objective and professional tone in your analysis. Ensure that the information is accurate and relevant to the text provided. 
+**Example Format:**
+
+1. **Element Name:**
+   - *Description:* A brief explanation of the element, its role, and significance.
+
+2. **Element Name:**
+   - *Description:* A brief explanation of the element, its role, and significance.
+
+*...and so on for each main element identified.*
+
+**Text to Analyze:**
+{content}

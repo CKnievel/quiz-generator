@@ -34,5 +34,11 @@
     "answer": "The discount factor determines how much future rewards are valued compared to immediate rewards. A higher gamma means the agent cares more about long-term rewards.",
     "rating": "4",
     "explanation": "This answer provides a basic understanding of the discount factor but doesn't explain how to choose values for different problems or discuss the implications of different gamma values on agent behavior."
+    },
+    {
+    "question": "Now, consider this: how does the ability to take actions change the way an agent learns compared to a scenario where it can only observe state transitions and rewards (like in an MRP)?",
+    "answer": "I do not understand the question.",
+    "rating": "0",
+    "explanation": "This answer does not address the question and shows a lack of understanding of the concept being asked about."
     }
     ]

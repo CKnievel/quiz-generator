@@ -1,4 +1,4 @@
-llm_model: "llama3.1:70b"
+llm_model: "gemma2:27b"
 temperature: 0.5
-top_k: 5
-top_p: 0.8
+top_k: 7
+top_p: 0.7
