@@ -86,7 +86,18 @@ if not args.input_s:
         for summary in summaries:
             file.write(summary + "\n")
 else:
-    # Summary file is given, read the file
+    # Summarize the text per chunk
+    print("Loading model for summarization...", end="", flush=True)
+    model = ChatOllama(
+                model=args.model_s,
+                temperature=0.5,
+                keep_alive=-1,
+                top_k=10,
+                top_p=0.7,
+            )
+    print("done")
+
+    # Transcript file is given, read the file
     with open(args.input_s, "r", encoding="utf-8") as file:
         summary = file.read()
 
@@ -95,7 +106,7 @@ with open("prompts/summary_prompt.txt", "r") as file:
     query = file.read()
 
 chain = PromptTemplate.from_template(template=query) | model
-summary = chain.invoke({"content": summary.content})
+summary = chain.invoke({"content": summary})
 
 # save summary to output file
 with open(args.output , "w", encoding="utf-8") as file:
