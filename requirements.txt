@@ -3,3 +3,6 @@ langchain
 langchain-community
 pyyaml
 json
+streamlit
+streamlit-cookies-controller
+pandas

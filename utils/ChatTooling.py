@@ -6,6 +6,10 @@ from langsmith import traceable
 import yaml
 import json
 from pathlib import Path
+import pandas as pd
+from datetime import datetime
+import random
+import string
 
 class ChatTooling:
     def __init__(self) -> None:
@@ -30,10 +34,25 @@ class ChatTooling:
 
         self.question_count = 0
 
+        # leaderboard variables
+        self.score_per_session = 0.0
+        self.bsubmit_score_to_leaderboard = False
+        self.user_acronym = ''.join(random.choices(string.ascii_uppercase, k=3))
+        self.chapter = None
+
     def load_config(self, config_path):
         """ Helper function to load the configuration file. """        
         with open(config_path) as file: 
             return yaml.safe_load(file)
+
+    def activate_submission_to_leaderbord(self, bsubmit : bool)-> None:
+        self.bsubmit_score_to_leaderboard = bsubmit
+
+    def set_user_acronym(self, user_acronym):
+        self.user_acronym = user_acronym
+
+    def set_chapter(self, chapter):
+        self.chapter = chapter
 
     def load_prompts(self, prompts_path):
         """ Helper function to load the prompt files. """
@@ -129,6 +148,7 @@ class ChatTooling:
         # Iterate over the serialized history to pair AI questions with human answers
         message_answer_pairs = []
         rating_per_qa = []
+        score_per_qa = []
         for i, message in enumerate(serialized_history):
 
             # skip the first message
@@ -160,14 +180,107 @@ class ChatTooling:
                 # Store rating for this question-answer pair
                 rating_per_qa.append(rating.content)
 
+                bfoundScore, score = self.extract_and_validate_rating(rating.content)
+
+                if bfoundScore:
+                    score_per_qa.append(score)
+
                 # Clear the list after processing a full AI-human pair
                 message_answer_pairs.clear()
+
+        # if rating and score are of equal length, then all scores were found
+        if len(rating_per_qa) == len(score_per_qa):
+            if self.bsubmit_score_to_leaderboard:
+                self.score_per_session = self.calculate_score(score_per_qa)
+                self.add_score_to_leaderboard(self.user_acronym, self.chapter)
+   
 
         # Format the array into a string
         rating_per_qa = "\n".join([f"Question {i+1}: {rating} \n\n" for i, rating in enumerate(rating_per_qa)])
 
         return rating_per_qa
 
+    def extract_and_validate_rating(self, text):
+        # Convert to lowercase to make it case-insensitive
+        text_lower = text.lower()
+        if 'rating' not in text_lower:
+            return False, None
+        
+        # Find the position of 'rating'
+        rating_pos = text_lower.find('rating')
+        
+        # Get the substring starting from 'rating'
+        remaining_text = text[rating_pos:]
+        
+        # Find first number after 'rating'
+        # Skip non-digit characters until we find a digit or negative sign
+        i = 6  # length of 'rating'
+        while i < len(remaining_text):
+            if remaining_text[i].isdigit() or remaining_text[i] == '-':
+                # Found start of number, extract until non-digit
+                num_start = i
+                i += 1
+                while i < len(remaining_text) and (remaining_text[i].isdigit() or remaining_text[i] == '.'):
+                    i += 1
+                try:
+                    score = float(remaining_text[num_start:i])
+                    return True, score
+                except ValueError:
+                    return False, None
+            i += 1
+        
+        return False, None
+
     def reset_conversation(self):
         self.conversation_buffer.clear()
         self.question_count = 0
+
+    # get leaderboard
+    def get_leaderboard(self, csv_file = 'utils/leaderboard.csv') -> pd.DataFrame:
+        try:
+            df_leaderboard = pd.read_csv(csv_file, header = None)
+            df_leaderboard.columns = ['Username', 'Score', 'Chapter', 'Submission Time']
+            df_leaderboard = df_leaderboard.sort_values(by = 'Chapter', ascending = False)
+        except pd.errors.EmptyDataError:
+            df_leaderboard = pd.DataFrame(columns = ['Username', 'Score', 'Chapter', 'Submission Time'])
+        return df_leaderboard
+
+    # add score to leaderboard
+    def add_score_to_leaderboard(self, username, chapter, csv_file = 'utils/leaderboard.csv') -> None:
+        try:
+            df_ldb = self.get_leaderboard(csv_file)
+            #check for empty dataframe
+            if df_ldb.empty:
+                # raise EmptyDataError to handle empty dataframe
+                raise pd.errors.EmptyDataError
+            
+            # check if lowercase username already exists
+            if df_ldb['Username'].str.lower().str.contains(username.lower()).any():
+                # check if chapter of this user is already in the leaderboard
+                if df_ldb[(df_ldb['Username'].str.lower() == username.lower()) & (df_ldb['Chapter'] == chapter)].empty:
+                    # add new row
+                    new_row = {'Username': username, 'Score': self.score_per_session, 'Chapter': chapter, 'Submission Time': datetime.now().strftime("%Y-%m-%d")}                    
+                    df_ldb = pd.concat([df_ldb, pd.DataFrame([new_row])], ignore_index=True)
+                    df_ldb.to_csv(csv_file, index = False, header = False)
+                else:
+                    # update score only if new score is higher
+                    new_score = self.score_per_session
+                    if new_score > df_ldb[(df_ldb['Username'].str.lower() == username.lower()) & (df_ldb['Chapter'] == chapter)]['Score'].values[0]:
+                        df_ldb.loc[(df_ldb['Username'].str.lower() == username.lower()) & (df_ldb['Chapter'] == chapter), 'Score'] = new_score
+                        df_ldb.loc[(df_ldb['Username'].str.lower() == username.lower()) & (df_ldb['Chapter'] == chapter), 'Submission Time'] = datetime.now().strftime("%Y-%m-%d")
+                        df_ldb.to_csv(csv_file, index = False, header = False)
+        except pd.errors.EmptyDataError:
+            df = pd.DataFrame(columns = ['Username', 'Score', 'Chapter', 'Submission Time'])
+            new_row = {
+                    'Username': username, 
+                    'Score': self.score_per_session, 
+                    'Chapter': chapter, 
+                    'Submission Time': datetime.now().strftime("%Y-%m-%d")
+                    }
+            df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+            
+            df.to_csv(csv_file, index = False, header = False)
+
+    # calculate score out of list of question scores
+    def calculate_score(self, question_scores):
+        return round(sum(question_scores) / len(question_scores),2)
