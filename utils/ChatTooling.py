@@ -2,6 +2,7 @@ from langchain_community.chat_models import ChatOllama
 from langchain.prompts import (ChatPromptTemplate, MessagesPlaceholder, SystemMessagePromptTemplate, HumanMessagePromptTemplate)
 from langchain.chains.conversation.memory import ConversationBufferMemory
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
+from langchain_anthropic import ChatAnthropic
 from langsmith import traceable
 import yaml
 import json
@@ -10,18 +11,32 @@ import pandas as pd
 from datetime import datetime
 import random
 import string
-
+from dotenv import load_dotenv
+import os 
 class ChatTooling:
     def __init__(self) -> None:
         self.config = self.load_config(Path("utils/config_chat.yaml"))
         self.prompts = self.load_prompts("prompts")
-        self.model = ChatOllama(
-            model=self.config['llm_model'],
-            temperature=self.config.get('temperature', 0.5),
-            top_k=self.config.get('top_k', 5), 
-            top_p=self.config.get('top_p', 0.8),
-            keep_alive = 3600,
-        )
+
+        if self.config['llm_model'] == 'anthropic':
+            load_dotenv()
+            MODEL = "claude-3-5-sonnet-20240620"
+            ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+            self.model = ChatAnthropic(
+                anthropic_api_key=ANTHROPIC_API_KEY, 
+                model_name=MODEL, 
+                temperature=self.config.get('temperature', 0.5), 
+                max_tokens=3000
+            )
+
+        else:
+            self.model = ChatOllama(
+                model=self.config['llm_model'],
+                temperature=self.config.get('temperature', 0.5),
+                top_k=self.config.get('top_k', 5), 
+                top_p=self.config.get('top_p', 0.8),
+                keep_alive = 3600,
+            )
         
         self.system_prompt = self.prompts['system_prompt']
         

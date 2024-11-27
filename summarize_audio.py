@@ -4,7 +4,11 @@ import argparse
 import whisper
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.chat_models import ChatOllama
+from langchain_anthropic import ChatAnthropic
 from langchain.prompts import (PromptTemplate)
+
+from dotenv import load_dotenv
+import os 
 
 # Create the argument parser
 parser = argparse.ArgumentParser(description="Convert speech to text and summarize the text.")
@@ -54,13 +58,26 @@ if not args.input_s:
 
     # Summarize the text per chunk
     print("Loading model for summarization...", end="", flush=True)
-    model = ChatOllama(
-                model=args.model_s,
-                temperature=0.5,
-                keep_alive=-1,
-                top_k=10,
-                top_p=0.7,
-            )
+    if args.model_s == "anthropic":
+        load_dotenv()
+        MODEL = "claude-3-5-sonnet-20240620"
+        ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+        model = ChatAnthropic(
+            anthropic_api_key=ANTHROPIC_API_KEY, 
+            model_name=MODEL, 
+            temperature=0.5, 
+            max_tokens=3000
+        )
+
+    else:
+        model = ChatOllama(
+            model=args.model_s,
+            temperature=0.5,
+            top_k=10, 
+            top_p=0.7,
+            keep_alive = -1,
+        )
+    
     print("done")
 
 
@@ -88,13 +105,26 @@ if not args.input_s:
 else:
     # Summarize the text per chunk
     print("Loading model for summarization...", end="", flush=True)
-    model = ChatOllama(
-                model=args.model_s,
-                temperature=0.5,
-                keep_alive=-1,
-                top_k=10,
-                top_p=0.7,
-            )
+    if args.model_s == "anthropic":
+        load_dotenv()
+        MODEL = "claude-3-5-sonnet-20240620"
+        ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+        model = ChatAnthropic(
+            anthropic_api_key=ANTHROPIC_API_KEY, 
+            model_name=MODEL, 
+            temperature=0.5, 
+            max_tokens=3000
+        )
+
+    else:
+        model = ChatOllama(
+            model=args.model_s,
+            temperature=0.5,
+            top_k=10, 
+            top_p=0.7,
+            keep_alive = -1,
+        )
+    
     print("done")
 
     # Transcript file is given, read the file
