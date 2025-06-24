@@ -200,6 +200,9 @@ def page(config):
         st.session_state["selected_file"] = selected_file
         st.session_state["selected_chapter"] = len(numbered_files) - selected[0]
         
+        # Reset quiz states when selecting a new file
+        st.session_state["quiz_completed"] = False
+        st.session_state["rating_complete"] = False
         
         # Initialize chat and store results
         assistant, messages = initialize_chat(
