@@ -1,7 +1,6 @@
-from langchain_community.chat_models import ChatOllama
+from langchain_ollama import ChatOllama
 from langchain.prompts import (ChatPromptTemplate, MessagesPlaceholder, SystemMessagePromptTemplate, HumanMessagePromptTemplate)
-from langchain.chains.conversation.memory import ConversationBufferMemory
-from langchain.schema import HumanMessage, AIMessage, SystemMessage
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from langchain_anthropic import ChatAnthropic
 from langsmith import traceable
 import yaml
@@ -40,10 +39,8 @@ class ChatTooling:
         
         self.system_prompt = self.prompts['system_prompt']
         
-        self.conversation_buffer = ConversationBufferMemory(
-            memory_key="history",
-            return_messages=True
-        )
+        # Replace ConversationBufferMemory with simple message list
+        self.conversation_history = []
 
         self._initialize_chain()
 
@@ -110,7 +107,7 @@ class ChatTooling:
     @traceable
     def query(self, user_input):                
         # Serialize the conversation history
-        serialized_history = self._serialize_messages(self.conversation_buffer.chat_memory.messages)
+        serialized_history = self._serialize_messages(self.conversation_history)
         
         # Increment the question count
         self.question_count += 1
@@ -121,11 +118,11 @@ class ChatTooling:
             "input": user_input
         })
         
-        # Manually add the human input to the memory
-        self.conversation_buffer.chat_memory.add_message(HumanMessage(content=user_input))
+        # Add the human input to the conversation history
+        self.conversation_history.append(HumanMessage(content=user_input))
 
-        # Manually add the AI response to the memory
-        self.conversation_buffer.chat_memory.add_message(response)
+        # Add the AI response to the conversation history
+        self.conversation_history.append(response)
 
         return response.content
 
@@ -136,7 +133,7 @@ class ChatTooling:
     def _generate_final_rating(self):
 
         # Serialize the conversation history        
-        serialized_history = self._serialize_messages(self.conversation_buffer.chat_memory.messages)
+        serialized_history = self._serialize_messages(self.conversation_history)
 
         # Define reference examples for rating user responses
         with open('prompts/example_ratings.json','r') as f:
@@ -207,7 +204,12 @@ class ChatTooling:
         if len(rating_per_qa) == len(score_per_qa):
             if self.bsubmit_score_to_leaderboard:
                 self.score_per_session = self.calculate_score(score_per_qa)
+                print(f"DEBUG: Saving score {self.score_per_session} for user {self.user_acronym} in chapter {self.chapter}")
                 self.add_score_to_leaderboard(self.user_acronym, self.chapter)
+            else:
+                print(f"DEBUG: Score submission disabled for user {self.user_acronym}")
+        else:
+            print(f"DEBUG: Score calculation failed - ratings: {len(rating_per_qa)}, scores: {len(score_per_qa)}")
    
 
         # Format the array into a string
@@ -247,7 +249,7 @@ class ChatTooling:
         return False, None
 
     def reset_conversation(self):
-        self.conversation_buffer.clear()
+        self.conversation_history.clear()
         self.question_count = 0
 
     # get leaderboard
