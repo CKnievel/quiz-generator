@@ -1,8 +1,9 @@
 openai-whisper
 langchain
 langchain-community
+langchain-anthropic
+langchain-ollama
 pyyaml
-json
 streamlit
 streamlit-cookies-controller
 pandas
