@@ -38,6 +38,19 @@ The configuration of the quiz is done in the `config.yaml` file.
 
 ## Usage
 
+### Installing dependencies
+
+To install the dependencies, run the following command:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+Pull LLM models from Ollama:
+
+    ```bash
+    ollama pull gemma2:27b
+    ```
+
 ### Creating summaries of audio files
 
 To create a summary of an audio file, run the following command:
